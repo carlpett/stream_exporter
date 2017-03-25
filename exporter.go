@@ -47,21 +47,6 @@ func main() {
 		panic(err)
 	}
 
-	// "Config input"
-	err = syscall.Mkfifo("/tmp/myfifo", 0666)
-	if err != nil {
-		panic(err)
-	}
-	defer rmfifo()
-
-	pipe, err := os.OpenFile("/tmp/myfifo", os.O_RDONLY, os.ModeNamedPipe)
-	if err != nil {
-		panic(err)
-	}
-
-	reader := bufio.NewReader(pipe)
-	scanner := bufio.NewScanner(reader)
-
 	// "Define metrics"
 	metrics := make([]linemetrics.LineMetric, 0, len(config.Metrics))
 	for _, definition := range config.Metrics {
@@ -81,6 +66,21 @@ func main() {
 		}
 		metrics = append(metrics, lineMetric)
 	}
+
+	// "Config input"
+	err = syscall.Mkfifo("/tmp/myfifo", 0666)
+	if err != nil {
+		panic(err)
+	}
+	defer rmfifo()
+
+	pipe, err := os.OpenFile("/tmp/myfifo", os.O_RDONLY, os.ModeNamedPipe)
+	if err != nil {
+		panic(err)
+	}
+
+	reader := bufio.NewReader(pipe)
+	scanner := bufio.NewScanner(reader)
 
 	// "Main loop"
 	for scanner.Scan() {
