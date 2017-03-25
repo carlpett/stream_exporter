@@ -77,6 +77,7 @@ func main() {
 		case histogram:
 			lineMetric = linemetrics.NewHistogramLineMetric(definition.Name, labels, pattern)
 		case summary:
+			lineMetric = linemetrics.NewSummaryLineMetric(definition.Name, labels, pattern)
 		}
 		metrics = append(metrics, lineMetric)
 	}

@@ -2,8 +2,11 @@ input:
   namedPipe: /tmp/mypipe
   format: raw_lines
 metrics:
-  - name: zzz_operation_duration_seconds
+  - name: zzz_histogram_operation_duration_seconds
     kind: histogram
+    pattern: "(?P<operation>\\w+) took (?P<value>[0-9\\.]+) seconds"
+  - name: zzz_summary_operation_duration_seconds
+    kind: summary
     pattern: "(?P<operation>\\w+) took (?P<value>[0-9\\.]+) seconds"
   - name: zzz_total_lines
     kind: counter
