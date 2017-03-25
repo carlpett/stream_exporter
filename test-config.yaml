@@ -2,12 +2,15 @@ input:
   namedPipe: /tmp/mypipe
   format: raw_lines
 metrics:
-  - name: foo_duration_seconds
+  - name: zzz_operation_duration_seconds
     kind: histogram
     pattern: "(?P<operation>\\w+) took (?P<value>[0-9\\.]+) seconds"
-  - name: total_lines
+  - name: zzz_total_lines
     kind: counter
     pattern: ".+"
+  - name: zzz_latest_reading
+    kind: gauge
+    pattern: "Latest reading: (?P<value>[0-9\\.]+)"
 exposition:
   address: :10000
   path: /metrics

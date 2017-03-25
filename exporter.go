@@ -68,16 +68,17 @@ func main() {
 		pattern := regexp.MustCompile(definition.Pattern)
 		labels := pattern.SubexpNames()[1:] // First element is entire expression
 
+		var lineMetric linemetrics.LineMetric
 		switch definition.Kind {
 		case counter:
-			lineMetric := linemetrics.NewCounterLineMetric(definition.Name, labels, pattern)
-			metrics = append(metrics, lineMetric)
+			lineMetric = linemetrics.NewCounterLineMetric(definition.Name, labels, pattern)
 		case gauge:
+			lineMetric = linemetrics.NewGaugeLineMetric(definition.Name, labels, pattern)
 		case histogram:
-			lineMetric := linemetrics.NewHistogramLineMetric(definition.Name, labels, pattern)
-			metrics = append(metrics, lineMetric)
+			lineMetric = linemetrics.NewHistogramLineMetric(definition.Name, labels, pattern)
 		case summary:
 		}
+		metrics = append(metrics, lineMetric)
 	}
 
 	// "Main loop"

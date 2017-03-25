@@ -1,7 +1,6 @@
 package linemetrics
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -83,21 +82,4 @@ func NewHistogramLineMetric(name string, labels []string, pattern *regexp.Regexp
 	}
 
 	return lineMetric
-}
-
-func getValueCaptureIndex(labels []string) (int, error) {
-	foundValue := false
-	valueIdx := 0
-	for idx, l := range labels {
-		if l == "value" {
-			foundValue = true
-			valueIdx = idx
-			break
-		}
-	}
-	if !foundValue {
-		return valueIdx, errors.New("No named capture group for 'value'")
-	}
-
-	return valueIdx, nil
 }
