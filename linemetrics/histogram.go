@@ -1,6 +1,7 @@
 package linemetrics
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -17,7 +18,8 @@ type HistogramLineMetric struct {
 func (histogram HistogramLineMetric) MatchLine(s string) {
 	matches := histogram.pattern.FindStringSubmatch(s)
 	if len(matches) > 0 {
-		valueStr := matches[histogram.valueIdx+1]
+		captures := matches[1:]
+		valueStr := captures[histogram.valueIdx]
 		value, err := strconv.ParseFloat(valueStr, 64)
 		if err != nil {
 			fmt.Printf("Unable to convert %s to float\n", valueStr)
@@ -37,40 +39,31 @@ type HistogramVecLineMetric struct {
 func (histogram HistogramVecLineMetric) MatchLine(s string) {
 	matches := histogram.pattern.FindStringSubmatch(s)
 	if len(matches) > 0 {
-		valueStr := matches[histogram.valueIdx+1]
+		captures := matches[1:]
+		valueStr := captures[histogram.valueIdx]
 		value, err := strconv.ParseFloat(valueStr, 64)
 		if err != nil {
 			fmt.Printf("Unable to convert %s to float\n", valueStr)
-			fmt.Printf("Matches: %v, Idx: %d\n", matches, histogram.valueIdx)
 			return
 		}
-		capturedLabels := append(matches[1:histogram.valueIdx+1], matches[histogram.valueIdx+2:]...)
-		fmt.Println(capturedLabels)
+		capturedLabels := append(captures[0:histogram.valueIdx], captures[histogram.valueIdx+1:]...)
 		histogram.metric.WithLabelValues(capturedLabels...).Observe(value)
 	}
 }
 
 func NewHistogramLineMetric(name string, labels []string, pattern *regexp.Regexp) LineMetric {
-	foundValue := false
-	valueIdx := 0
-	for idx, l := range labels {
-		if l == "value" {
-			foundValue = true
-			valueIdx = idx
-			break
-		}
+	valueIdx, err := getValueCaptureIndex(labels)
+	if err != nil {
+		panic(fmt.Sprintf("Error initializing histogram %s: %s", name, err))
 	}
-	if !foundValue {
-		panic("No capture group for value in histogram")
-	}
-	labels = append(labels[0:valueIdx], labels[valueIdx+1:]...)
+	labels = append(labels[:valueIdx], labels[valueIdx+1:]...)
 
 	opts := prometheus.HistogramOpts{
 		Name: name,
 		Help: name,
 	}
 	var lineMetric LineMetric
-	if len(labels) > 1 {
+	if len(labels) > 0 {
 		metric := prometheus.NewHistogramVec(opts, labels)
 		lineMetric = HistogramVecLineMetric{
 			pattern:  *pattern,
@@ -90,4 +83,21 @@ func NewHistogramLineMetric(name string, labels []string, pattern *regexp.Regexp
 	}
 
 	return lineMetric
+}
+
+func getValueCaptureIndex(labels []string) (int, error) {
+	foundValue := false
+	valueIdx := 0
+	for idx, l := range labels {
+		if l == "value" {
+			foundValue = true
+			valueIdx = idx
+			break
+		}
+	}
+	if !foundValue {
+		return valueIdx, errors.New("No named capture group for 'value'")
+	}
+
+	return valueIdx, nil
 }
