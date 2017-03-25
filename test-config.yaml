@@ -1,0 +1,13 @@
+input:
+  namedPipe: /tmp/mypipe
+  format: raw_lines
+metrics:
+  - name: foo_duration_seconds
+    kind: histogram
+    pattern: "(?P<operation>\\w+) took (?P<value>[0-9\\.]+) seconds"
+  - name: total_lines
+    kind: counter
+    pattern: ".+"
+exposition:
+  address: :10000
+  path: /metrics
