@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"regexp"
 	"syscall"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/yaml.v2"
@@ -18,21 +18,22 @@ func rmfifo() {
 	os.Remove("/tmp/myfifo")
 }
 
-type metricKind string
-
-const (
-	counter   metricKind = "counter"
-	gauge     metricKind = "gauge"
-	histogram metricKind = "histogram"
-	summary   metricKind = "summary"
+var (
+	lineProcessingTime = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Namespace: "stream_exporter",
+			Subsystem: "line_processing",
+			Name:      "duration_seconds",
+			Help:      "Observed duration, in seconds, of processing a single line per registered metric",
+			Buckets:   prometheus.ExponentialBuckets(time.Microsecond.Seconds(), 3.981072, 5),
+			// This results in 5 buckets from 1 us to approx 1 ms (3.98...^5 ~= 1000)
+		},
+		[]string{"metric"},
+	)
 )
 
 type Config struct {
-	Metrics []struct {
-		Name    string
-		Kind    metricKind
-		Pattern string
-	}
+	Metrics []linemetrics.MetricsConfig
 }
 
 func main() {
@@ -50,22 +51,11 @@ func main() {
 	// "Define metrics"
 	metrics := make([]linemetrics.LineMetric, 0, len(config.Metrics))
 	for _, definition := range config.Metrics {
-		pattern := regexp.MustCompile(definition.Pattern)
-		labels := pattern.SubexpNames()[1:] // First element is entire expression
-
-		var lineMetric linemetrics.LineMetric
-		switch definition.Kind {
-		case counter:
-			lineMetric = linemetrics.NewCounterLineMetric(definition.Name, labels, pattern)
-		case gauge:
-			lineMetric = linemetrics.NewGaugeLineMetric(definition.Name, labels, pattern)
-		case histogram:
-			lineMetric = linemetrics.NewHistogramLineMetric(definition.Name, labels, pattern)
-		case summary:
-			lineMetric = linemetrics.NewSummaryLineMetric(definition.Name, labels, pattern)
-		}
+		lineMetric := linemetrics.NewLineMetric(definition.Name, definition.Pattern, definition.Kind)
 		metrics = append(metrics, lineMetric)
 	}
+
+	prometheus.MustRegister(lineProcessingTime)
 
 	// "Config input"
 	err = syscall.Mkfifo("/tmp/myfifo", 0666)
@@ -86,11 +76,13 @@ func main() {
 	for scanner.Scan() {
 		line := scanner.Text()
 		for _, m := range metrics {
+			t := time.Now()
 			m.MatchLine(line)
+			lineProcessingTime.WithLabelValues(m.Name()).Observe(time.Since(t).Seconds())
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, "reading standard input:", err)
+		fmt.Fprintln(os.Stderr, err)
 	}
 
 	metfam, err := prometheus.DefaultGatherer.Gather()

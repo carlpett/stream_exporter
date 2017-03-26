@@ -2,14 +2,13 @@ package linemetrics
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 type HistogramLineMetric struct {
-	pattern  regexp.Regexp
+	BaseLineMetric
 	valueIdx int
 	metric   prometheus.Histogram
 }
@@ -29,8 +28,7 @@ func (histogram HistogramLineMetric) MatchLine(s string) {
 }
 
 type HistogramVecLineMetric struct {
-	pattern  regexp.Regexp
-	labels   []string
+	BaseLineMetric
 	valueIdx int
 	metric   prometheus.HistogramVec
 }
@@ -50,33 +48,32 @@ func (histogram HistogramVecLineMetric) MatchLine(s string) {
 	}
 }
 
-func NewHistogramLineMetric(name string, labels []string, pattern *regexp.Regexp) LineMetric {
-	valueIdx, err := getValueCaptureIndex(labels)
+func NewHistogramLineMetric(base BaseLineMetric) LineMetric {
+	valueIdx, err := getValueCaptureIndex(base.labels)
 	if err != nil {
-		panic(fmt.Sprintf("Error initializing histogram %s: %s", name, err))
+		panic(fmt.Sprintf("Error initializing histogram %s: %s", base.name, err))
 	}
-	labels = append(labels[:valueIdx], labels[valueIdx+1:]...)
+	base.labels = append(base.labels[:valueIdx], base.labels[valueIdx+1:]...)
 
 	opts := prometheus.HistogramOpts{
-		Name: name,
-		Help: name,
+		Name: base.name,
+		Help: base.name,
 	}
 	var lineMetric LineMetric
-	if len(labels) > 0 {
-		metric := prometheus.NewHistogramVec(opts, labels)
+	if len(base.labels) > 0 {
+		metric := prometheus.NewHistogramVec(opts, base.labels)
 		lineMetric = HistogramVecLineMetric{
-			pattern:  *pattern,
-			labels:   labels,
-			valueIdx: valueIdx,
-			metric:   *metric,
+			BaseLineMetric: base,
+			valueIdx:       valueIdx,
+			metric:         *metric,
 		}
 		prometheus.Register(metric)
 	} else {
 		metric := prometheus.NewHistogram(opts)
 		lineMetric = HistogramLineMetric{
-			pattern:  *pattern,
-			valueIdx: valueIdx,
-			metric:   metric,
+			BaseLineMetric: base,
+			valueIdx:       valueIdx,
+			metric:         metric,
 		}
 		prometheus.Register(metric)
 	}

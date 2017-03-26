@@ -2,16 +2,14 @@ package linemetrics
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 type GaugeVecLineMetric struct {
-	pattern  regexp.Regexp
+	BaseLineMetric
 	valueIdx int
-	labels   []string
 	metric   prometheus.GaugeVec
 }
 
@@ -30,8 +28,8 @@ func (gauge GaugeVecLineMetric) MatchLine(s string) {
 }
 
 type GaugeLineMetric struct {
-	pattern regexp.Regexp
-	metric  prometheus.Gauge
+	BaseLineMetric
+	metric prometheus.Gauge
 }
 
 func (gauge GaugeLineMetric) MatchLine(s string) {
@@ -49,33 +47,32 @@ func (gauge GaugeLineMetric) MatchLine(s string) {
 	}
 }
 
-func NewGaugeLineMetric(name string, labels []string, pattern *regexp.Regexp) LineMetric {
-	valueIdx, err := getValueCaptureIndex(labels)
+func NewGaugeLineMetric(base BaseLineMetric) LineMetric {
+	valueIdx, err := getValueCaptureIndex(base.labels)
 	if err != nil {
-		panic(fmt.Sprintf("Error initializing gauge %s: %s", name, err))
+		panic(fmt.Sprintf("Error initializing gauge %s: %s", base.name, err))
 	}
-	labels = append(labels[:valueIdx], labels[valueIdx+1:]...)
+	base.labels = append(base.labels[:valueIdx], base.labels[valueIdx+1:]...)
 
 	opts := prometheus.GaugeOpts{
-		Name: name,
-		Help: name,
+		Name: base.name,
+		Help: base.name,
 	}
 	var lineMetric LineMetric
-	if len(labels) > 0 {
-		metric := prometheus.NewGaugeVec(opts, labels)
+	if len(base.labels) > 0 {
+		metric := prometheus.NewGaugeVec(opts, base.labels)
 		lineMetric = GaugeVecLineMetric{
-			pattern:  *pattern,
-			valueIdx: valueIdx,
-			labels:   labels,
-			metric:   *metric,
+			BaseLineMetric: base,
+			valueIdx:       valueIdx,
+			metric:         *metric,
 		}
 		prometheus.Register(metric)
 
 	} else {
 		metric := prometheus.NewGauge(opts)
 		lineMetric = GaugeLineMetric{
-			pattern: *pattern,
-			metric:  metric,
+			BaseLineMetric: base,
+			metric:         metric,
 		}
 		prometheus.Register(metric)
 	}

@@ -1,15 +1,12 @@
 package linemetrics
 
 import (
-	"regexp"
-
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 type CounterVecLineMetric struct {
-	pattern regexp.Regexp
-	labels  []string
-	metric  prometheus.CounterVec
+	BaseLineMetric
+	metric prometheus.CounterVec
 }
 
 func (counter CounterVecLineMetric) MatchLine(s string) {
@@ -21,8 +18,8 @@ func (counter CounterVecLineMetric) MatchLine(s string) {
 }
 
 type CounterLineMetric struct {
-	pattern regexp.Regexp
-	metric  prometheus.Counter
+	BaseLineMetric
+	metric prometheus.Counter
 }
 
 func (counter CounterLineMetric) MatchLine(s string) {
@@ -32,26 +29,25 @@ func (counter CounterLineMetric) MatchLine(s string) {
 	}
 }
 
-func NewCounterLineMetric(name string, labels []string, pattern *regexp.Regexp) LineMetric {
+func NewCounterLineMetric(base BaseLineMetric) LineMetric {
 	opts := prometheus.CounterOpts{
-		Name: name,
-		Help: name,
+		Name: base.name,
+		Help: base.name,
 	}
 	var lineMetric LineMetric
-	if len(labels) > 0 {
-		metric := prometheus.NewCounterVec(opts, labels)
+	if len(base.labels) > 0 {
+		metric := prometheus.NewCounterVec(opts, base.labels)
 		lineMetric = CounterVecLineMetric{
-			pattern: *pattern,
-			labels:  labels,
-			metric:  *metric,
+			BaseLineMetric: base,
+			metric:         *metric,
 		}
 		prometheus.Register(metric)
 
 	} else {
 		metric := prometheus.NewCounter(opts)
 		lineMetric = CounterLineMetric{
-			pattern: *pattern,
-			metric:  metric,
+			BaseLineMetric: base,
+			metric:         metric,
 		}
 		prometheus.Register(metric)
 	}

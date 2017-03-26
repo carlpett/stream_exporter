@@ -2,14 +2,13 @@ package linemetrics
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 type SummaryLineMetric struct {
-	pattern  regexp.Regexp
+	BaseLineMetric
 	valueIdx int
 	metric   prometheus.Summary
 }
@@ -29,8 +28,7 @@ func (summary SummaryLineMetric) MatchLine(s string) {
 }
 
 type SummaryVecLineMetric struct {
-	pattern  regexp.Regexp
-	labels   []string
+	BaseLineMetric
 	valueIdx int
 	metric   prometheus.SummaryVec
 }
@@ -50,33 +48,32 @@ func (summary SummaryVecLineMetric) MatchLine(s string) {
 	}
 }
 
-func NewSummaryLineMetric(name string, labels []string, pattern *regexp.Regexp) LineMetric {
-	valueIdx, err := getValueCaptureIndex(labels)
+func NewSummaryLineMetric(base BaseLineMetric) LineMetric {
+	valueIdx, err := getValueCaptureIndex(base.labels)
 	if err != nil {
-		panic(fmt.Sprintf("Error initializing summary %s: %s", name, err))
+		panic(fmt.Sprintf("Error initializing summary %s: %s", base.name, err))
 	}
-	labels = append(labels[:valueIdx], labels[valueIdx+1:]...)
+	base.labels = append(base.labels[:valueIdx], base.labels[valueIdx+1:]...)
 
 	opts := prometheus.SummaryOpts{
-		Name: name,
-		Help: name,
+		Name: base.name,
+		Help: base.name,
 	}
 	var lineMetric LineMetric
-	if len(labels) > 0 {
-		metric := prometheus.NewSummaryVec(opts, labels)
+	if len(base.labels) > 0 {
+		metric := prometheus.NewSummaryVec(opts, base.labels)
 		lineMetric = SummaryVecLineMetric{
-			pattern:  *pattern,
-			labels:   labels,
-			valueIdx: valueIdx,
-			metric:   *metric,
+			BaseLineMetric: base,
+			valueIdx:       valueIdx,
+			metric:         *metric,
 		}
 		prometheus.Register(metric)
 	} else {
 		metric := prometheus.NewSummary(opts)
 		lineMetric = SummaryLineMetric{
-			pattern:  *pattern,
-			valueIdx: valueIdx,
-			metric:   metric,
+			BaseLineMetric: base,
+			valueIdx:       valueIdx,
+			metric:         metric,
 		}
 		prometheus.Register(metric)
 	}
