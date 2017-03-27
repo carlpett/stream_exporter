@@ -1,22 +1,16 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io/ioutil"
-	"os"
-	"syscall"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/yaml.v2"
 
+	"github.com/carlpett/stream_exporter/input"
 	"github.com/carlpett/stream_exporter/linemetrics"
 )
-
-func rmfifo() {
-	os.Remove("/tmp/myfifo")
-}
 
 var (
 	lineProcessingTime = prometheus.NewHistogramVec(
@@ -33,6 +27,7 @@ var (
 )
 
 type Config struct {
+	Input   input.InputConfig
 	Metrics []linemetrics.MetricsConfig
 }
 
@@ -58,31 +53,19 @@ func main() {
 	prometheus.MustRegister(lineProcessingTime)
 
 	// "Config input"
-	err = syscall.Mkfifo("/tmp/myfifo", 0666)
-	if err != nil {
-		panic(err)
-	}
-	defer rmfifo()
-
-	pipe, err := os.OpenFile("/tmp/myfifo", os.O_RDONLY, os.ModeNamedPipe)
-	if err != nil {
-		panic(err)
-	}
-
-	reader := bufio.NewReader(pipe)
-	scanner := bufio.NewScanner(reader)
+	inputReader := input.NewInput(config.Input)
 
 	// "Main loop"
-	for scanner.Scan() {
-		line := scanner.Text()
+	for {
+		line, err := inputReader.ReadLine()
+		if err != nil {
+			break
+		}
 		for _, m := range metrics {
 			t := time.Now()
 			m.MatchLine(line)
 			lineProcessingTime.WithLabelValues(m.Name()).Observe(time.Since(t).Seconds())
 		}
-	}
-	if err := scanner.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
 	}
 
 	metfam, err := prometheus.DefaultGatherer.Gather()
