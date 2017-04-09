@@ -1,7 +1,7 @@
 package input
 
 type StreamInput interface {
-	ReadLine() (string, error)
+	StartStream(ch chan<- string)
 }
 
 var inputTypes = make(map[string]func(InputConfig) StreamInput)

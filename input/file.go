@@ -2,7 +2,6 @@ package input
 
 import (
 	"bufio"
-	"io"
 	"os"
 )
 
@@ -11,7 +10,7 @@ type FileInputConfig struct {
 }
 
 type FileInput struct {
-	scanner *bufio.Scanner
+	config FileInputConfig
 }
 
 func init() {
@@ -19,21 +18,24 @@ func init() {
 }
 
 func newFileInput(config InputConfig) StreamInput {
-	file, err := os.Open(config.FilePath)
+	return FileInput{
+		config: config.FileInputConfig,
+	}
+}
+
+func (input FileInput) StartStream(ch chan<- string) {
+	defer close(ch)
+
+	file, err := os.Open(input.config.FilePath)
 	if err != nil {
 		panic(err)
 	}
+	defer file.Close()
 
 	reader := bufio.NewReader(file)
 	scanner := bufio.NewScanner(reader)
 
-	return FileInput{scanner: scanner}
-}
-
-func (file FileInput) ReadLine() (string, error) {
-	if file.scanner.Scan() {
-		return file.scanner.Text(), nil
-	} else {
-		return "", io.EOF
+	for scanner.Scan() {
+		ch <- scanner.Text()
 	}
 }

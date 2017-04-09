@@ -11,39 +11,28 @@ func init() {
 	registerInput(inputTypeNamedPipe, newNamedPipeInput)
 }
 
-func rmfifo(path string) {
-	os.Remove(path)
+func newNamedPipeInput(config InputConfig) StreamInput {
+	return NamedPipeInput{
+		config: config,
+	}
 }
 
-func newNamedPipeInput(config InputConfig) StreamInput {
-	err := syscall.Mkfifo(config.PipePath, 0666)
+func (socket SocketInput) StartStream(ch chan<- string) {
+	err := syscall.Mkfifo(socket.config.PipePath, 0666)
 	if err != nil {
 		panic(err)
 	}
 
-	pipe, err := os.OpenFile(config.PipePath, os.O_RDONLY, os.ModeNamedPipe)
+	pipe, err := os.OpenFile(socket.config.PipePath, os.O_RDONLY, os.ModeNamedPipe)
 	if err != nil {
 		panic(err)
 	}
+	defer os.Remove(path)
 
 	reader := bufio.NewReader(pipe)
 	scanner := bufio.NewScanner(reader)
 
-	return NamedPipeInput{
-		scanner: scanner,
-		config:  config,
+	for scanner.Scan() {
+		ch <- scanner.Text()
 	}
-}
-
-func (pipe NamedPipeInput) ReadLine() (string, error) {
-	if pipe.scanner.Scan() {
-		return pipe.scanner.Text(), nil
-	} else {
-		return "", io.EOF
-	}
-}
-
-// TODO
-func (pipe NamedPipeInput) Close() {
-	rmfifo(pipe.config.Path)
 }
