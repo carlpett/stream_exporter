@@ -6,12 +6,20 @@ import (
 	"os"
 )
 
+type FileInputConfig struct {
+	FilePath string `mapstructure:"file_path"`
+}
+
 type FileInput struct {
 	scanner *bufio.Scanner
 }
 
-func newFileInput(config InputConfig) FileInput {
-	file, err := os.Open("/tmp/myfile")
+func init() {
+	registerInput(inputTypeFile, newFileInput)
+}
+
+func newFileInput(config InputConfig) StreamInput {
+	file, err := os.Open(config.FilePath)
 	if err != nil {
 		panic(err)
 	}

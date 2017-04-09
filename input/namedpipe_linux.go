@@ -7,17 +7,21 @@ import (
 	"syscall"
 )
 
-func rmfifo() {
-	os.Remove("/tmp/myfifo")
+func init() {
+	registerInput(inputTypeNamedPipe, newNamedPipeInput)
 }
 
-func newNamedPipeInput(config InputConfig) NamedPipeInput {
-	err := syscall.Mkfifo("/tmp/myfifo", 0666)
+func rmfifo(path string) {
+	os.Remove(path)
+}
+
+func newNamedPipeInput(config InputConfig) StreamInput {
+	err := syscall.Mkfifo(config.PipePath, 0666)
 	if err != nil {
 		panic(err)
 	}
 
-	pipe, err := os.OpenFile("/tmp/myfifo", os.O_RDONLY, os.ModeNamedPipe)
+	pipe, err := os.OpenFile(config.PipePath, os.O_RDONLY, os.ModeNamedPipe)
 	if err != nil {
 		panic(err)
 	}
@@ -25,7 +29,10 @@ func newNamedPipeInput(config InputConfig) NamedPipeInput {
 	reader := bufio.NewReader(pipe)
 	scanner := bufio.NewScanner(reader)
 
-	return NamedPipeInput{scanner: scanner}
+	return NamedPipeInput{
+		scanner: scanner,
+		config:  config,
+	}
 }
 
 func (pipe NamedPipeInput) ReadLine() (string, error) {
@@ -38,5 +45,5 @@ func (pipe NamedPipeInput) ReadLine() (string, error) {
 
 // TODO
 func (pipe NamedPipeInput) Close() {
-	rmfifo()
+	rmfifo(pipe.config.Path)
 }

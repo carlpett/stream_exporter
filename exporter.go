@@ -1,10 +1,13 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"time"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/yaml.v2"
 
@@ -27,18 +30,26 @@ var (
 )
 
 type Config struct {
-	Input   input.InputConfig
-	Metrics []linemetrics.MetricsConfig
+	Input   input.InputConfig           `mapstructure:"input"`
+	Metrics []linemetrics.MetricsConfig `mapstructure:"metrics"`
 }
 
+var (
+	configFilePath = flag.String("config-file", "stream_exporter.yaml", "path to config file")
+)
+
 func main() {
-	// "Read config"
-	content, err := ioutil.ReadFile("test-config.yaml")
+	content, err := ioutil.ReadFile(*configFilePath)
+	if err != nil {
+		os.Exit(1)
+	}
+	rawConfig := make(map[string]interface{})
+	err = yaml.Unmarshal(content, &rawConfig)
 	if err != nil {
 		panic(err)
 	}
-	config := Config{}
-	err = yaml.Unmarshal(content, &config)
+	var config Config
+	err = mapstructure.Decode(rawConfig, &config)
 	if err != nil {
 		panic(err)
 	}
