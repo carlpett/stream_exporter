@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/signal"
 	"time"
@@ -31,8 +32,13 @@ var (
 )
 
 type Config struct {
-	Input   input.InputConfig           `mapstructure:"input"`
-	Metrics []linemetrics.MetricsConfig `mapstructure:"metrics"`
+	Input      input.InputConfig           `mapstructure:"input"`
+	Metrics    []linemetrics.MetricsConfig `mapstructure:"metrics"`
+	Exposition ExpositionConfig            `mapstructure:"exposition"`
+}
+type ExpositionConfig struct {
+	ListenAddress string `mapstructure:"address"`
+	Path          string `mapstructure:"path"`
 }
 
 var (
@@ -73,6 +79,10 @@ func main() {
 	inputReader := input.NewInput(config.Input)
 	inputChannel := make(chan string)
 	go inputReader.StartStream(inputChannel)
+
+	// Setup http server
+	http.Handle(config.Exposition.Path, prometheus.Handler())
+	go http.ListenAndServe(config.Exposition.ListenAddress, nil)
 
 	// Main loop
 	done := false
