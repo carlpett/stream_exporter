@@ -2,7 +2,9 @@ package input
 
 import (
 	"bufio"
+	"errors"
 	"flag"
+	"fmt"
 	"net"
 )
 
@@ -20,21 +22,21 @@ func init() {
 	registerInput("socket", newSocketInput)
 }
 
-func newSocketInput() StreamInput {
+func newSocketInput() (StreamInput, error) {
 	if *socketFamily == "" {
-		panic("Socket family not set")
+		return nil, errors.New("-input.socket.family not set")
 	} else if *socketFamily != "tcp" && *socketFamily != "udp" && *socketFamily != "domain" {
-		panic("Invalid socket family")
+		return nil, errors.New(fmt.Sprintf("%q is not a valid value for -input.socket.family", *socketFamily))
 	}
 
 	if *socketListenAddr == "" {
-		panic("Socket listening address not set")
+		return nil, errors.New("-input.socket.listenaddr not set")
 	}
 
 	return SocketInput{
 		family:     *socketFamily,
 		listenAddr: *socketListenAddr,
-	}
+	}, nil
 }
 
 func (socket SocketInput) StartStream(ch chan<- string) {

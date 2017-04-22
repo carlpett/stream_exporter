@@ -2,6 +2,8 @@ package input
 
 import (
 	"bufio"
+	"errors"
+	"fmt"
 	"io"
 	"os"
 	"syscall"
@@ -15,10 +17,14 @@ var (
 	pipePath = flag.String("input.namedpipe.path", "", "Path where pipe should be created")
 )
 
-func newNamedPipeInput() StreamInput {
+func newNamedPipeInput() (StreamInput, error) {
+	if *filePath == "" {
+		return nil, errors.New("-input.namedpipe.path not set")
+	}
+
 	return NamedPipeInput{
 		path: *pipePath,
-	}
+	}, nil
 }
 
 func (input NamedPipeInput) StartStream(ch chan<- string) {

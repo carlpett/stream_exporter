@@ -2,6 +2,7 @@ package input
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"os"
 )
@@ -18,14 +19,14 @@ func init() {
 	registerInput("file", newFileInput)
 }
 
-func newFileInput() StreamInput {
+func newFileInput() (StreamInput, error) {
 	if *filePath == "" {
-		panic("No file path set")
+		return nil, errors.New("-input.file.path not set")
 	}
 
 	return FileInput{
 		path: *filePath,
-	}
+	}, nil
 }
 
 func (input FileInput) StartStream(ch chan<- string) {

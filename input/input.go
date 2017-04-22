@@ -1,12 +1,17 @@
 package input
 
+import (
+	"errors"
+	"fmt"
+)
+
 type StreamInput interface {
 	StartStream(ch chan<- string)
 }
 
-var inputTypes = make(map[string]func() StreamInput)
+var inputTypes = make(map[string]func() (StreamInput, error))
 
-func registerInput(inputType string, factory func() StreamInput) {
+func registerInput(inputType string, factory func() (StreamInput, error)) {
 	inputTypes[inputType] = factory
 }
 
@@ -18,10 +23,10 @@ func GetAvailableInputs() []string {
 	return inputs
 }
 
-func NewInput(inputType string) StreamInput {
+func NewInput(inputType string) (StreamInput, error) {
 	factory, registered := inputTypes[inputType]
 	if !registered {
-		panic("Unknown input type")
+		return nil, errors.New(fmt.Sprintf("Unknown input type %v", inputType))
 	}
 	return factory()
 }

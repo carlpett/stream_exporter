@@ -70,7 +70,11 @@ func main() {
 	signal.Notify(quitSig, os.Interrupt)
 
 	// Configure input
-	inputReader := input.NewInput(*inputType)
+	inputReader, err := input.NewInput(*inputType)
+	if err != nil {
+		log.Fatalf("Could not initialize input: %v", err)
+	}
+
 	inputChannel := make(chan string)
 	go inputReader.StartStream(inputChannel)
 
