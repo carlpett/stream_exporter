@@ -2,7 +2,10 @@ package linemetrics
 
 import (
 	"errors"
+	"io/ioutil"
 	"regexp"
+
+	"gopkg.in/yaml.v2"
 )
 
 type LineMetric interface {
@@ -18,6 +21,25 @@ type BaseLineMetric struct {
 
 func (m BaseLineMetric) Name() string {
 	return m.name
+}
+
+type config struct {
+	metrics []MetricsConfig
+}
+
+func ReadPatternConfig(path string) ([]MetricsConfig, error) {
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var config config
+	err = yaml.Unmarshal(content, &config)
+	if err != nil {
+		return nil, err
+	}
+
+	return config.metrics, nil
 }
 
 func NewLineMetric(name string, rawPattern string, kind metricKind) LineMetric {

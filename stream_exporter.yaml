@@ -1,11 +1,10 @@
-input:
-  type: file
-  file_path: c:\\temp\\hostnames
-  format: raw_lines
 metrics:
   - name: zzz_total_lines
     kind: counter
     pattern: ".+"
+  - name: zzz_comments
+    kind: counter
+    pattern: "^#.+"
   # - name: zzz_histogram_operation_duration_seconds
   #   kind: histogram
   #   pattern: "(?P<operation>\\w+) took (?P<value>[0-9\\.]+) seconds"
@@ -18,6 +17,3 @@ metrics:
   - name: haproxy_response_time
     kind: histogram
     pattern: \[26/Mar/2017[^\]]+\] (?P<frontend>[a-z-]+) (?P<backend>[^/]+)/(?P<server>[^ ]+) \d+/\d+/\d+/\d+/\d+ (?P<status_code>\d+) (?P<value>\d+) - - ---- \d+/\d+/0/0/0 0/0 {(?P<host_header>[^\|]+)\|.+\|} "[^"]+"
-exposition:
-  address: :10000
-  path: /metrics

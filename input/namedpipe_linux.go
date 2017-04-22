@@ -11,23 +11,27 @@ func init() {
 	registerInput(inputTypeNamedPipe, newNamedPipeInput)
 }
 
-func newNamedPipeInput(config InputConfig) StreamInput {
+var (
+	pipePath = flag.String("input.namedpipe.path", "", "Path where pipe should be created")
+)
+
+func newNamedPipeInput() StreamInput {
 	return NamedPipeInput{
-		config: config,
+		path: *pipePath,
 	}
 }
 
-func (socket SocketInput) StartStream(ch chan<- string) {
-	err := syscall.Mkfifo(socket.config.PipePath, 0666)
+func (input NamedPipeInput) StartStream(ch chan<- string) {
+	err := syscall.Mkfifo(input.path, 0666)
 	if err != nil {
 		panic(err)
 	}
 
-	pipe, err := os.OpenFile(socket.config.PipePath, os.O_RDONLY, os.ModeNamedPipe)
+	pipe, err := os.OpenFile(input.path, os.O_RDONLY, os.ModeNamedPipe)
 	if err != nil {
 		panic(err)
 	}
-	defer os.Remove(path)
+	defer os.Remove(input.path)
 
 	reader := bufio.NewReader(pipe)
 	scanner := bufio.NewScanner(reader)

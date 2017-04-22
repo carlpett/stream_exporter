@@ -2,31 +2,43 @@ package input
 
 import (
 	"bufio"
+	"flag"
 	"net"
 )
 
-type SocketInputConfig struct {
-	SocketType string `mapstructure:"socket_type"`
-	ListenAddr string `mapstructure:"socket_listenaddr"`
+type SocketInput struct {
+	family     string
+	listenAddr string
 }
 
-type SocketInput struct {
-	config SocketInputConfig
-}
+var (
+	socketFamily     = flag.String("input.socket.family", "tcp", "Socket family (tcp/udp/etc)")
+	socketListenAddr = flag.String("input.socket.listenaddr", "", "Listening address of socket")
+)
 
 func init() {
 	registerInput(inputTypeSocket, newSocketInput)
 }
 
-func newSocketInput(config InputConfig) StreamInput {
-	// TODO: Validate config
+func newSocketInput() StreamInput {
+	if *socketFamily == "" {
+		panic("Socket family not set")
+	} else if *socketFamily != "tcp" && *socketFamily != "udp" && *socketFamily != "domain" {
+		panic("Invalid socket family")
+	}
+
+	if *socketListenAddr == "" {
+		panic("Socket listening address not set")
+	}
+
 	return SocketInput{
-		config: config.SocketInputConfig,
+		family:     *socketFamily,
+		listenAddr: *socketListenAddr,
 	}
 }
 
 func (socket SocketInput) StartStream(ch chan<- string) {
-	l, err := net.Listen(socket.config.SocketType, socket.config.ListenAddr)
+	l, err := net.Listen(socket.family, socket.listenAddr)
 	if err != nil {
 		panic(err)
 	}

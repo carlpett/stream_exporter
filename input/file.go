@@ -2,31 +2,36 @@ package input
 
 import (
 	"bufio"
+	"flag"
 	"os"
 )
 
-type FileInputConfig struct {
-	FilePath string `mapstructure:"file_path"`
+type FileInput struct {
+	path string
 }
 
-type FileInput struct {
-	config FileInputConfig
-}
+var (
+	filePath = flag.String("input.file.path", "", "Path to file to read")
+)
 
 func init() {
 	registerInput(inputTypeFile, newFileInput)
 }
 
-func newFileInput(config InputConfig) StreamInput {
+func newFileInput() StreamInput {
+	if *filePath == "" {
+		panic("No file path set")
+	}
+
 	return FileInput{
-		config: config.FileInputConfig,
+		path: *filePath,
 	}
 }
 
 func (input FileInput) StartStream(ch chan<- string) {
 	defer close(ch)
 
-	file, err := os.Open(input.config.FilePath)
+	file, err := os.Open(input.path)
 	if err != nil {
 		panic(err)
 	}
