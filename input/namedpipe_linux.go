@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	registerInput(inputTypeNamedPipe, newNamedPipeInput)
+	registerInput("namedpipe", newNamedPipeInput)
 }
 
 var (

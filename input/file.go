@@ -15,7 +15,7 @@ var (
 )
 
 func init() {
-	registerInput(inputTypeFile, newFileInput)
+	registerInput("file", newFileInput)
 }
 
 func newFileInput() StreamInput {

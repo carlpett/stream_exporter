@@ -17,7 +17,7 @@ var (
 )
 
 func init() {
-	registerInput(inputTypeSocket, newSocketInput)
+	registerInput("socket", newSocketInput)
 }
 
 func newSocketInput() StreamInput {
