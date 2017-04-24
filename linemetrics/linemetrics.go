@@ -2,6 +2,7 @@ package linemetrics
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"regexp"
 
@@ -24,7 +25,7 @@ func (m BaseLineMetric) Name() string {
 }
 
 type config struct {
-	metrics []MetricsConfig
+	Metrics []MetricsConfig
 }
 
 func ReadPatternConfig(path string) ([]MetricsConfig, error) {
@@ -39,7 +40,7 @@ func ReadPatternConfig(path string) ([]MetricsConfig, error) {
 		return nil, err
 	}
 
-	return config.metrics, nil
+	return config.Metrics, nil
 }
 
 func NewLineMetric(name string, rawPattern string, kind metricKind) LineMetric {
