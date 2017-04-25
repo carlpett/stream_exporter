@@ -15,18 +15,6 @@
 			"revisionTime": "2016-02-29T21:34:45Z"
 		},
 		{
-			"checksumSHA1": "eHLqQ7SK0RHbigdxrzj7RKaN1lw=",
-			"path": "github.com/carlpett/stream_exporter/input",
-			"revision": "ab01ffab1df54063d36531abf43362e5e7e06788",
-			"revisionTime": "2017-04-25T14:39:31Z"
-		},
-		{
-			"checksumSHA1": "Kha7xsB/3zAKhmVQut4e4UX39oU=",
-			"path": "github.com/carlpett/stream_exporter/linemetrics",
-			"revision": "ab01ffab1df54063d36531abf43362e5e7e06788",
-			"revisionTime": "2017-04-25T14:39:31Z"
-		},
-		{
 			"checksumSHA1": "Vbpe4x7bFx6kaotrEtzQZ2UtB84=",
 			"path": "github.com/golang/protobuf/proto",
 			"revision": "34a5f244f1c01cdfee8e60324258cfbb97a42aec",
