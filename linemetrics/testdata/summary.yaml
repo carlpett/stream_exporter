@@ -1,0 +1,12 @@
+metrics:
+  - name: unit_test_summary
+    kind: summary
+    pattern: (?P<value>\d+)
+    objectives:
+      0.1: 0.1
+      0.2: 0.2
+      0.3: 0.3
+      0.4: 0.4
+    max_age: 15m
+    age_buckets: 3
+    buf_cap: 500

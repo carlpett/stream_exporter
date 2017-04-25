@@ -68,7 +68,7 @@ func main() {
 	// Define metrics
 	metrics := make([]linemetrics.LineMetric, 0, len(metricsConfig))
 	for _, definition := range metricsConfig {
-		lineMetric, collector := linemetrics.NewLineMetric(definition.Name, definition.Pattern, definition.Kind)
+		lineMetric, collector := linemetrics.NewLineMetric(definition)
 		metrics = append(metrics, lineMetric)
 		prometheus.MustRegister(collector)
 	}

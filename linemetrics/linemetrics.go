@@ -43,26 +43,26 @@ func ReadPatternConfig(path string) ([]MetricsConfig, error) {
 	return config.Metrics, nil
 }
 
-func NewLineMetric(name string, rawPattern string, kind metricKind) (LineMetric, prometheus.Collector) {
-	pattern := regexp.MustCompile(rawPattern)
+func NewLineMetric(config MetricsConfig) (LineMetric, prometheus.Collector) {
+	pattern := regexp.MustCompile(config.Pattern)
 	labels := pattern.SubexpNames()[1:] // First element is entire expression
 
 	var lineMetric LineMetric
 	base := BaseLineMetric{
-		name:    name,
+		name:    config.Name,
 		pattern: *pattern,
 		labels:  labels,
 	}
 	var collector prometheus.Collector
-	switch kind {
+	switch config.Kind {
 	case counter:
 		lineMetric, collector = NewCounterLineMetric(base)
 	case gauge:
 		lineMetric, collector = NewGaugeLineMetric(base)
 	case histogram:
-		lineMetric, collector = NewHistogramLineMetric(base)
+		lineMetric, collector = NewHistogramLineMetric(base, config.HistogramConfig)
 	case summary:
-		lineMetric, collector = NewSummaryLineMetric(base)
+		lineMetric, collector = NewSummaryLineMetric(base, config.SummaryConfig)
 	}
 
 	return lineMetric, collector
