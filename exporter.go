@@ -28,6 +28,14 @@ var (
 		},
 		[]string{"metric"},
 	)
+	totalLines = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Namespace: "stream_exporter",
+			Subsystem: "line_processing",
+			Name:      "lines_total",
+			Help:      "Number of lines processed",
+		},
+	)
 )
 
 var (
@@ -66,6 +74,7 @@ func main() {
 	}
 
 	prometheus.MustRegister(lineProcessingTime)
+	prometheus.MustRegister(totalLines)
 
 	// Setup signal handling
 	quitSig := make(chan os.Signal, 1)
@@ -98,6 +107,7 @@ func main() {
 				m.MatchLine(line)
 				lineProcessingTime.WithLabelValues(m.Name()).Observe(time.Since(t).Seconds())
 			}
+			totalLines.Inc()
 		case <-quitSig:
 			fmt.Println("Received quit signal, shutting down...")
 			done = true
