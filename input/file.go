@@ -87,6 +87,7 @@ func (input TailingFileInput) StartStream(ch chan<- string) {
 	if err != nil {
 		panic(err)
 	}
+	defer tailer.Cleanup()
 
 	for line := range tailer.Lines {
 		ch <- line.Text
