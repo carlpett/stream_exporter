@@ -129,4 +129,4 @@ The `namedpipe` input has one parameter:
 
 
 # Building
-`go get` and `go build` should get you started locally.
+The project uses [govendor](https://github.com/kardianos/govendor) for dependency management. To build the exporter, call `govendor build +p`.
