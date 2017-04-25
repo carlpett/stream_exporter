@@ -3,10 +3,11 @@ package input
 import (
 	"bufio"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"syscall"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 func init() {
@@ -30,12 +31,12 @@ func newNamedPipeInput() (StreamInput, error) {
 func (input NamedPipeInput) StartStream(ch chan<- string) {
 	err := syscall.Mkfifo(input.path, 0666)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	pipe, err := os.OpenFile(input.path, os.O_RDONLY, os.ModeNamedPipe)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer os.Remove(input.path)
 

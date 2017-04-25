@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/hpcloud/tail"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/expfmt"
@@ -53,7 +54,7 @@ func (input DryrunFileInput) StartStream(ch chan<- string) {
 
 	file, err := os.Open(input.path)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer file.Close()
 
@@ -64,17 +65,17 @@ func (input DryrunFileInput) StartStream(ch chan<- string) {
 		ch <- scanner.Text()
 	}
 
+	fmt.Println("Finished reading file, dumping final metrics endpoint output:")
 	metfam, err := prometheus.DefaultGatherer.Gather()
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	out := &bytes.Buffer{}
 	for _, met := range metfam {
 		if _, err := expfmt.MetricFamilyToText(out, met); err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 	}
-	fmt.Println("Finished reading file, dumping final metrics endpoint output:")
 	fmt.Println(out)
 }
 
@@ -85,7 +86,7 @@ func (input TailingFileInput) StartStream(ch chan<- string) {
 	}
 	tailer, err := tail.TailFile(input.path, tailConfig)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer tailer.Cleanup()
 

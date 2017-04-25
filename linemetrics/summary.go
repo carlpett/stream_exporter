@@ -1,9 +1,9 @@
 package linemetrics
 
 import (
-	"fmt"
 	"strconv"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -20,7 +20,7 @@ func (summary SummaryLineMetric) MatchLine(s string) {
 		valueStr := captures[summary.valueIdx]
 		value, err := strconv.ParseFloat(valueStr, 64)
 		if err != nil {
-			fmt.Printf("Unable to convert %s to float\n", valueStr)
+			log.Warnf("Unable to convert %s to float\n", valueStr)
 			return
 		}
 		summary.metric.Observe(value)
@@ -40,7 +40,7 @@ func (summary SummaryVecLineMetric) MatchLine(s string) {
 		valueStr := captures[summary.valueIdx]
 		value, err := strconv.ParseFloat(valueStr, 64)
 		if err != nil {
-			fmt.Printf("Unable to convert %s to float\n", valueStr)
+			log.Warnf("Unable to convert %s to float\n", valueStr)
 			return
 		}
 		capturedLabels := append(captures[0:summary.valueIdx], captures[summary.valueIdx+1:]...)
@@ -51,7 +51,7 @@ func (summary SummaryVecLineMetric) MatchLine(s string) {
 func NewSummaryLineMetric(base BaseLineMetric, config SummaryConfig) (LineMetric, prometheus.Collector) {
 	valueIdx, err := getValueCaptureIndex(base.labels)
 	if err != nil {
-		panic(fmt.Sprintf("Error initializing summary %s: %s", base.name, err))
+		log.Fatalf("Error initializing summary %s: %s", base.name, err)
 	}
 	base.labels = append(base.labels[:valueIdx], base.labels[valueIdx+1:]...)
 

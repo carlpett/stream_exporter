@@ -6,6 +6,8 @@ import (
 	"flag"
 	"fmt"
 	"net"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 type SocketInput struct {
@@ -42,13 +44,13 @@ func newSocketInput() (StreamInput, error) {
 func (socket SocketInput) StartStream(ch chan<- string) {
 	l, err := net.Listen(socket.family, socket.listenAddr)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer l.Close()
 	for {
 		conn, err := l.Accept()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		go func(c net.Conn) {
 			// TODO: Timeout + metrics for failed reads

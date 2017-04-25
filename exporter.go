@@ -3,12 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
@@ -109,7 +109,7 @@ func main() {
 			}
 			totalLines.Inc()
 		case <-quitSig:
-			fmt.Println("Received quit signal, shutting down...")
+			log.Info("Received quit signal, shutting down...")
 			done = true
 			break
 		}

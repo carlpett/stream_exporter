@@ -1,9 +1,9 @@
 package linemetrics
 
 import (
-	"fmt"
 	"strconv"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -20,7 +20,7 @@ func (gauge GaugeVecLineMetric) MatchLine(s string) {
 		valueStr := captures[gauge.valueIdx]
 		value, err := strconv.ParseFloat(valueStr, 64)
 		if err != nil {
-			fmt.Printf("Unable to convert %s to float\n", valueStr)
+			log.Warnf("Unable to convert %s to float\n", valueStr)
 			return
 		}
 		gauge.metric.WithLabelValues(captures...).Set(value)
@@ -39,7 +39,7 @@ func (gauge GaugeLineMetric) MatchLine(s string) {
 		valueStr := captures[0] // There are no other labels
 		value, err := strconv.ParseFloat(valueStr, 64)
 		if err != nil {
-			fmt.Printf("Unable to convert %s to float\n", valueStr)
+			log.Warnf("Unable to convert %s to float\n", valueStr)
 			return
 		}
 
@@ -50,7 +50,7 @@ func (gauge GaugeLineMetric) MatchLine(s string) {
 func NewGaugeLineMetric(base BaseLineMetric) (LineMetric, prometheus.Collector) {
 	valueIdx, err := getValueCaptureIndex(base.labels)
 	if err != nil {
-		panic(fmt.Sprintf("Error initializing gauge %s: %s", base.name, err))
+		log.Fatalf("Error initializing gauge %s: %s", base.name, err)
 	}
 	base.labels = append(base.labels[:valueIdx], base.labels[valueIdx+1:]...)
 
