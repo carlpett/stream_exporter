@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/carlpett/stream_exporter/input"
 	"github.com/carlpett/stream_exporter/linemetrics"
@@ -59,8 +60,9 @@ func main() {
 	// Define metrics
 	metrics := make([]linemetrics.LineMetric, 0, len(metricsConfig))
 	for _, definition := range metricsConfig {
-		lineMetric := linemetrics.NewLineMetric(definition.Name, definition.Pattern, definition.Kind)
+		lineMetric, collector := linemetrics.NewLineMetric(definition.Name, definition.Pattern, definition.Kind)
 		metrics = append(metrics, lineMetric)
+		prometheus.MustRegister(collector)
 	}
 
 	prometheus.MustRegister(lineProcessingTime)
@@ -79,7 +81,7 @@ func main() {
 	go inputReader.StartStream(inputChannel)
 
 	// Setup http server
-	http.Handle(*metricsPath, prometheus.Handler())
+	http.Handle(*metricsPath, promhttp.Handler())
 	go http.ListenAndServe(*metricsListenAddr, nil)
 
 	// Main loop
@@ -101,13 +103,5 @@ func main() {
 			done = true
 			break
 		}
-	}
-
-	metfam, err := prometheus.DefaultGatherer.Gather()
-	if err != nil {
-		fmt.Println(err)
-	}
-	for _, met := range metfam {
-		fmt.Println(met)
 	}
 }

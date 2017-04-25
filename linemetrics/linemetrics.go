@@ -2,10 +2,10 @@ package linemetrics
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"regexp"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/yaml.v2"
 )
 
@@ -43,7 +43,7 @@ func ReadPatternConfig(path string) ([]MetricsConfig, error) {
 	return config.Metrics, nil
 }
 
-func NewLineMetric(name string, rawPattern string, kind metricKind) LineMetric {
+func NewLineMetric(name string, rawPattern string, kind metricKind) (LineMetric, prometheus.Collector) {
 	pattern := regexp.MustCompile(rawPattern)
 	labels := pattern.SubexpNames()[1:] // First element is entire expression
 
@@ -53,18 +53,19 @@ func NewLineMetric(name string, rawPattern string, kind metricKind) LineMetric {
 		pattern: *pattern,
 		labels:  labels,
 	}
+	var collector prometheus.Collector
 	switch kind {
 	case counter:
-		lineMetric = NewCounterLineMetric(base)
+		lineMetric, collector = NewCounterLineMetric(base)
 	case gauge:
-		lineMetric = NewGaugeLineMetric(base)
+		lineMetric, collector = NewGaugeLineMetric(base)
 	case histogram:
-		lineMetric = NewHistogramLineMetric(base)
+		lineMetric, collector = NewHistogramLineMetric(base)
 	case summary:
-		lineMetric = NewSummaryLineMetric(base)
+		lineMetric, collector = NewSummaryLineMetric(base)
 	}
 
-	return lineMetric
+	return lineMetric, collector
 }
 
 func getValueCaptureIndex(labels []string) (int, error) {

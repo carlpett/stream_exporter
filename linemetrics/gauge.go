@@ -47,7 +47,7 @@ func (gauge GaugeLineMetric) MatchLine(s string) {
 	}
 }
 
-func NewGaugeLineMetric(base BaseLineMetric) LineMetric {
+func NewGaugeLineMetric(base BaseLineMetric) (LineMetric, prometheus.Collector) {
 	valueIdx, err := getValueCaptureIndex(base.labels)
 	if err != nil {
 		panic(fmt.Sprintf("Error initializing gauge %s: %s", base.name, err))
@@ -66,16 +66,13 @@ func NewGaugeLineMetric(base BaseLineMetric) LineMetric {
 			valueIdx:       valueIdx,
 			metric:         *metric,
 		}
-		prometheus.Register(metric)
-
+		return lineMetric, metric
 	} else {
 		metric := prometheus.NewGauge(opts)
 		lineMetric = GaugeLineMetric{
 			BaseLineMetric: base,
 			metric:         metric,
 		}
-		prometheus.Register(metric)
+		return lineMetric, metric
 	}
-
-	return lineMetric
 }

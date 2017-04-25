@@ -29,7 +29,7 @@ func (counter CounterLineMetric) MatchLine(s string) {
 	}
 }
 
-func NewCounterLineMetric(base BaseLineMetric) LineMetric {
+func NewCounterLineMetric(base BaseLineMetric) (LineMetric, prometheus.Collector) {
 	opts := prometheus.CounterOpts{
 		Name: base.name,
 		Help: base.name,
@@ -41,16 +41,13 @@ func NewCounterLineMetric(base BaseLineMetric) LineMetric {
 			BaseLineMetric: base,
 			metric:         *metric,
 		}
-		prometheus.Register(metric)
-
+		return lineMetric, metric
 	} else {
 		metric := prometheus.NewCounter(opts)
 		lineMetric = CounterLineMetric{
 			BaseLineMetric: base,
 			metric:         metric,
 		}
-		prometheus.Register(metric)
+		return lineMetric, metric
 	}
-
-	return lineMetric
 }

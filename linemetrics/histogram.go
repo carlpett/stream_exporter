@@ -48,7 +48,7 @@ func (histogram HistogramVecLineMetric) MatchLine(s string) {
 	}
 }
 
-func NewHistogramLineMetric(base BaseLineMetric) LineMetric {
+func NewHistogramLineMetric(base BaseLineMetric) (LineMetric, prometheus.Collector) {
 	valueIdx, err := getValueCaptureIndex(base.labels)
 	if err != nil {
 		panic(fmt.Sprintf("Error initializing histogram %s: %s", base.name, err))
@@ -67,7 +67,7 @@ func NewHistogramLineMetric(base BaseLineMetric) LineMetric {
 			valueIdx:       valueIdx,
 			metric:         *metric,
 		}
-		prometheus.Register(metric)
+		return lineMetric, metric
 	} else {
 		metric := prometheus.NewHistogram(opts)
 		lineMetric = HistogramLineMetric{
@@ -75,8 +75,6 @@ func NewHistogramLineMetric(base BaseLineMetric) LineMetric {
 			valueIdx:       valueIdx,
 			metric:         metric,
 		}
-		prometheus.Register(metric)
+		return lineMetric, metric
 	}
-
-	return lineMetric
 }

@@ -48,7 +48,7 @@ func (summary SummaryVecLineMetric) MatchLine(s string) {
 	}
 }
 
-func NewSummaryLineMetric(base BaseLineMetric) LineMetric {
+func NewSummaryLineMetric(base BaseLineMetric) (LineMetric, prometheus.Collector) {
 	valueIdx, err := getValueCaptureIndex(base.labels)
 	if err != nil {
 		panic(fmt.Sprintf("Error initializing summary %s: %s", base.name, err))
@@ -67,7 +67,7 @@ func NewSummaryLineMetric(base BaseLineMetric) LineMetric {
 			valueIdx:       valueIdx,
 			metric:         *metric,
 		}
-		prometheus.Register(metric)
+		return lineMetric, metric
 	} else {
 		metric := prometheus.NewSummary(opts)
 		lineMetric = SummaryLineMetric{
@@ -75,8 +75,6 @@ func NewSummaryLineMetric(base BaseLineMetric) LineMetric {
 			valueIdx:       valueIdx,
 			metric:         metric,
 		}
-		prometheus.Register(metric)
+		return lineMetric, metric
 	}
-
-	return lineMetric
 }
