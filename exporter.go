@@ -44,7 +44,7 @@ var (
 	inputType      = flag.String("input.type", "", "What input module to use")
 	listInputTypes = flag.Bool("input.print", false, "Print available input modules and exit")
 
-	metricsListenAddr = flag.String("web.listen-address", ":9177", "Address on which to expose metrics")
+	metricsListenAddr = flag.String("web.listen-address", ":9178", "Address on which to expose metrics")
 	metricsPath       = flag.String("web.metrics-path", "/metrics", "Path under which the metrics are available")
 )
 
