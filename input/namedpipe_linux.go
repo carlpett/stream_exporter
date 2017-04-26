@@ -3,7 +3,7 @@ package input
 import (
 	"bufio"
 	"errors"
-	"io"
+	"flag"
 	"os"
 	"syscall"
 
