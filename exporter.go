@@ -92,6 +92,7 @@ func main() {
 	// Setup http server
 	http.Handle(*metricsPath, promhttp.Handler())
 	go http.ListenAndServe(*metricsListenAddr, nil)
+	log.Infof("Serving metrics on %s%s", *metricsListenAddr, *metricsPath)
 
 	// Main loop
 	done := false
