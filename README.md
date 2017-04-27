@@ -120,6 +120,15 @@ The `socket` input has two parameters:
 - `input.socket.family` (Optional, default `tcp`): The address family to open the socket. Valid values depend on platform, but include `tcp` and `udp`. On Linux and certain other systems, `unix` is also available.
 - `input.socket.listenaddr` (Required): The listen specification, for example `:10000` to listen on all interfaces on port 10000.
 
+## Syslog
+Creates a syslog server which can act as a remote server from the local syslog server.
+
+The `syslog` input has three parameters:
+
+- `input.syslog.listenfamily` (Required): The address family of the server. Valid values depend on platform, but include `tcp` and `udp`. On Linux and certain other systems, `unix` is also available.
+- `input.syslog.listenaddr` (Required): The listen specification, for example `:1514` to listen on all interfaces on port 1514.
+- `input.syslog.format` (Optional, default `autodetect`): The format of the syslog messages. Defaults to automatic detection, can also be set to `rfc3164`, `rfc5424` or `rfc6587`.
+
 ## Named pipe
 Creates a named pipe to which lines can be written. Only available on Linux.
 
