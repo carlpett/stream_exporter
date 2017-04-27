@@ -112,6 +112,36 @@
 			"revisionTime": "2017-02-07T02:33:46Z"
 		},
 		{
+			"checksumSHA1": "417WG6CdS4VV+qYxxljK/HKpAPQ=",
+			"path": "gopkg.in/mcuadros/go-syslog.v2",
+			"revision": "9cf13b7327c0e153da3cba3540c2ae2b879c3859",
+			"revisionTime": "2016-10-11T17:43:29Z"
+		},
+		{
+			"checksumSHA1": "Acfl2ZWzL91O/B4L1YNpfUy0q5w=",
+			"path": "gopkg.in/mcuadros/go-syslog.v2/format",
+			"revision": "9cf13b7327c0e153da3cba3540c2ae2b879c3859",
+			"revisionTime": "2016-10-11T17:43:29Z"
+		},
+		{
+			"checksumSHA1": "mOYYkxHJfjXd2wf+btvQGOfn7R4=",
+			"path": "gopkg.in/mcuadros/go-syslog.v2/internal/syslogparser",
+			"revision": "9cf13b7327c0e153da3cba3540c2ae2b879c3859",
+			"revisionTime": "2016-10-11T17:43:29Z"
+		},
+		{
+			"checksumSHA1": "yYoC7dJPDX/w9t0mapjy9cMVryg=",
+			"path": "gopkg.in/mcuadros/go-syslog.v2/internal/syslogparser/rfc3164",
+			"revision": "9cf13b7327c0e153da3cba3540c2ae2b879c3859",
+			"revisionTime": "2016-10-11T17:43:29Z"
+		},
+		{
+			"checksumSHA1": "th6i8TVJmp7cqP624ByQ5w4MjaY=",
+			"path": "gopkg.in/mcuadros/go-syslog.v2/internal/syslogparser/rfc5424",
+			"revision": "9cf13b7327c0e153da3cba3540c2ae2b879c3859",
+			"revisionTime": "2016-10-11T17:43:29Z"
+		},
+		{
 			"checksumSHA1": "QF4S/m8RxYi4W+A98I1ZLb881n8=",
 			"origin": "github.com/hpcloud/tail/vendor/gopkg.in/tomb.v1",
 			"path": "gopkg.in/tomb.v1",
