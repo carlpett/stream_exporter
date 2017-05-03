@@ -92,7 +92,7 @@ func (input SyslogInput) StartStream(ch chan<- string) {
 
 	go func(lineIn syslog.LogPartsChannel) {
 		for parts := range lineIn {
-			ch <- parts["content"]
+			ch <- fmt.Sprintf("%v", parts["content"])
 			/* parts is a map with the following keys:
 			-hostname
 			-tag
