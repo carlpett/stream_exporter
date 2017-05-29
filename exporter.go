@@ -48,15 +48,29 @@ var (
 	metricsPath       = flag.String("web.metrics-path", "/metrics", "Path under which the metrics are available")
 )
 
+type startupTask func() error
+
+var quitSig = make(chan os.Signal, 1)
+var startupTasks = make(map[string]startupTask, 0)
+
 func main() {
 	flag.Parse()
+
+	// Startup tasks can be registered to perform (typically os-specific) initialization
+	for taskName, task := range startupTasks {
+		log.Debugf("Executing startup task '%s'", taskName)
+		err := task()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	if *listInputTypes {
 		fmt.Println(input.GetAvailableInputs())
 		os.Exit(0)
 	}
 	if *inputType == "" {
-		fmt.Printf("-input.type is required. The following input types are available:\n%v", input.GetAvailableInputs())
+		log.Errorf("-input.type is required. The following input types are available:\n%v", input.GetAvailableInputs())
 		os.Exit(1)
 	}
 
@@ -77,7 +91,6 @@ func main() {
 	prometheus.MustRegister(totalLines)
 
 	// Setup signal handling
-	quitSig := make(chan os.Signal, 1)
 	signal.Notify(quitSig, os.Interrupt)
 
 	// Configure input

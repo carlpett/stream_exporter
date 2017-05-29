@@ -3,10 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "4VNYIr1c9GYIo0tToZdpOGLm/YQ=",
+			"checksumSHA1": "pvV787RyoEIcpfi5G+W92G2nZbc=",
 			"path": "github.com/Sirupsen/logrus",
-			"revision": "081307d9bc1364753142d5962fc1d795c742baaf",
-			"revisionTime": "2016-04-16T08:21:37Z"
+			"revision": "5e5dc898656f695e2a086b8e12559febbfc01562",
+			"revisionTime": "2017-05-15T10:45:16Z"
 		},
 		{
 			"checksumSHA1": "0SQcBJ2JD1jEXr5uhmG/RNMa6t0=",
@@ -87,6 +87,12 @@
 			"revisionTime": "2016-05-03T22:05:32Z"
 		},
 		{
+			"checksumSHA1": "howv7JoirxaIZ0iakbCclN9JlhE=",
+			"path": "github.com/prometheus/common/log",
+			"revision": "13ba4ddd0caa9c28ca7b7bffe1dfa9ed8d5ef207",
+			"revisionTime": "2017-04-27T09:54:55Z"
+		},
+		{
 			"checksumSHA1": "62rPK8KngIUlDgBhEjW9CUsAhPQ=",
 			"path": "github.com/prometheus/common/model",
 			"revision": "dd586c1c5abb0be59e60f942c22af711a2008cb4",
@@ -99,10 +105,40 @@
 			"revisionTime": "2016-04-11T19:08:41Z"
 		},
 		{
-			"checksumSHA1": "/oZpHfYc+ZgOwYAhlvcMhmETYpw=",
+			"checksumSHA1": "rPV8+049OOLKJLcGhi5dNQ1yvBA=",
 			"path": "golang.org/x/sys/unix",
-			"revision": "99f16d856c9836c42d24e7ab64ea72916925fa97",
-			"revisionTime": "2017-03-08T15:04:45Z"
+			"revision": "a55a76086885b80f79961eacb876ebd8caf3868d",
+			"revisionTime": "2017-05-24T02:50:34Z"
+		},
+		{
+			"checksumSHA1": "2Coyr3Bq1dPkFg+ZYHEq1+/Rn58=",
+			"path": "golang.org/x/sys/windows",
+			"revision": "a55a76086885b80f79961eacb876ebd8caf3868d",
+			"revisionTime": "2017-05-24T02:50:34Z"
+		},
+		{
+			"checksumSHA1": "ZdFZFaXmCgEEaEhVPkyXrnhKhsg=",
+			"path": "golang.org/x/sys/windows/registry",
+			"revision": "a55a76086885b80f79961eacb876ebd8caf3868d",
+			"revisionTime": "2017-05-24T02:50:34Z"
+		},
+		{
+			"checksumSHA1": "TdCQEasBFqLJ/5mQgTvesIwC4BI=",
+			"path": "golang.org/x/sys/windows/svc",
+			"revision": "a55a76086885b80f79961eacb876ebd8caf3868d",
+			"revisionTime": "2017-05-24T02:50:34Z"
+		},
+		{
+			"checksumSHA1": "uVlUSSKplihZG7N+QJ6fzDZ4Kh8=",
+			"path": "golang.org/x/sys/windows/svc/eventlog",
+			"revision": "a55a76086885b80f79961eacb876ebd8caf3868d",
+			"revisionTime": "2017-05-24T02:50:34Z"
+		},
+		{
+			"checksumSHA1": "VTeuV40mC4+oHHK77+2OHi2x7LQ=",
+			"path": "golang.org/x/sys/windows/svc/mgr",
+			"revision": "a55a76086885b80f79961eacb876ebd8caf3868d",
+			"revisionTime": "2017-05-24T02:50:34Z"
 		},
 		{
 			"checksumSHA1": "oFfFiuMXIgISoinxUuV1/cIgjUQ=",
