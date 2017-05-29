@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 
-	log "github.com/Sirupsen/logrus"
+	"github.com/prometheus/common/log"
 	"gopkg.in/mcuadros/go-syslog.v2"
 	"gopkg.in/mcuadros/go-syslog.v2/format"
 )

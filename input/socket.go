@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net"
 
-	log "github.com/Sirupsen/logrus"
+	"github.com/prometheus/common/log"
 )
 
 type SocketInput struct {

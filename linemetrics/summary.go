@@ -3,8 +3,8 @@ package linemetrics
 import (
 	"strconv"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/common/log"
 )
 
 type SummaryLineMetric struct {

@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"os"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/hpcloud/tail"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/expfmt"
+	"github.com/prometheus/common/log"
 )
 
 type DryrunFileInput struct {
