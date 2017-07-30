@@ -11,6 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/log"
+	"github.com/prometheus/common/version"
 
 	"github.com/carlpett/stream_exporter/input"
 	"github.com/carlpett/stream_exporter/linemetrics"
@@ -40,6 +41,7 @@ var (
 
 var (
 	configFilePath = flag.String("config", "stream_exporter.yaml", "Path to config file")
+	showVersion    = flag.Bool("version", false, "Print version")
 
 	inputType      = flag.String("input.type", "", "What input module to use")
 	listInputTypes = flag.Bool("input.print", false, "Print available input modules and exit")
@@ -55,6 +57,12 @@ var startupTasks = make(map[string]startupTask, 0)
 
 func main() {
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf(version.Print("stream_exporter"))
+		os.Exit(0)
+	}
+	prometheus.MustRegister(version.NewCollector("stream_exporter"))
 
 	// Startup tasks can be registered to perform (typically os-specific) initialization
 	for taskName, task := range startupTasks {
