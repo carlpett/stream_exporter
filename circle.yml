@@ -13,7 +13,7 @@ dependencies:
   pre:
     - make promu
     - docker info
-    - git describe --always | sed -r 's/^v//' | tee VERSION
+    - git describe --always --tags | sed -r 's/^v//' | tee VERSION
   override:
     - promu crossbuild
     - ln -s .build/linux-amd64/stream_exporter stream_exporter
