@@ -21,34 +21,34 @@
 			"revisionTime": "2015-05-26T01:05:00Z"
 		},
 		{
-			"checksumSHA1": "VS9FBsm8AZ/MatpHUu0xgtXMePA=",
+			"checksumSHA1": "P5KyE9QEbAeHLeXzycSF/jS1FIc=",
 			"path": "github.com/hpcloud/tail",
-			"revision": "faf842bde7ed83bbc3c65a2c454fae39bc29a95f",
-			"revisionTime": "2017-02-07T02:33:46Z"
+			"revision": "37f4271387456dd1bf82ab1ad9229f060cc45386",
+			"revisionTime": "2017-08-14T16:06:53Z"
 		},
 		{
-			"checksumSHA1": "dcBCwjQT7+1vGUqJS/ApatZLz5k=",
+			"checksumSHA1": "qn3/Y771JaGG94CvdKa8pIj5hH0=",
 			"path": "github.com/hpcloud/tail/ratelimiter",
-			"revision": "faf842bde7ed83bbc3c65a2c454fae39bc29a95f",
-			"revisionTime": "2017-02-07T02:33:46Z"
+			"revision": "37f4271387456dd1bf82ab1ad9229f060cc45386",
+			"revisionTime": "2017-08-14T16:06:53Z"
 		},
 		{
-			"checksumSHA1": "t4NGDWk2wdDw9HE75WZGY4shnbk=",
+			"checksumSHA1": "0xM336Lb25URO/1W1/CtGoRygVU=",
 			"path": "github.com/hpcloud/tail/util",
-			"revision": "faf842bde7ed83bbc3c65a2c454fae39bc29a95f",
-			"revisionTime": "2017-02-07T02:33:46Z"
+			"revision": "37f4271387456dd1bf82ab1ad9229f060cc45386",
+			"revisionTime": "2017-08-14T16:06:53Z"
 		},
 		{
-			"checksumSHA1": "gMnfeLpiMViD+ldJGr4JnqKyqnI=",
+			"checksumSHA1": "TP4OAv5JMtzj2TB6OQBKqauaKDc=",
 			"path": "github.com/hpcloud/tail/watch",
-			"revision": "faf842bde7ed83bbc3c65a2c454fae39bc29a95f",
-			"revisionTime": "2017-02-07T02:33:46Z"
+			"revision": "37f4271387456dd1bf82ab1ad9229f060cc45386",
+			"revisionTime": "2017-08-14T16:06:53Z"
 		},
 		{
-			"checksumSHA1": "op7wvyXuY7hf6cXP2kIoW2CniuE=",
+			"checksumSHA1": "j65V4wnJboT4pfppNC/gjr2Gl+c=",
 			"path": "github.com/hpcloud/tail/winfile",
-			"revision": "faf842bde7ed83bbc3c65a2c454fae39bc29a95f",
-			"revisionTime": "2017-02-07T02:33:46Z"
+			"revision": "37f4271387456dd1bf82ab1ad9229f060cc45386",
+			"revisionTime": "2017-08-14T16:06:53Z"
 		},
 		{
 			"checksumSHA1": "bQ9BML+wAZd81vdDAOC1U+yN8dU=",
@@ -147,11 +147,11 @@
 			"revisionTime": "2017-05-24T02:50:34Z"
 		},
 		{
-			"checksumSHA1": "oFfFiuMXIgISoinxUuV1/cIgjUQ=",
+			"checksumSHA1": "nMlSQEeP3Zkg2HjHq3Hk/OPnbSY=",
 			"origin": "github.com/hpcloud/tail/vendor/gopkg.in/fsnotify.v1",
 			"path": "gopkg.in/fsnotify.v1",
-			"revision": "faf842bde7ed83bbc3c65a2c454fae39bc29a95f",
-			"revisionTime": "2017-02-07T02:33:46Z"
+			"revision": "37f4271387456dd1bf82ab1ad9229f060cc45386",
+			"revisionTime": "2017-08-14T16:06:53Z"
 		},
 		{
 			"checksumSHA1": "417WG6CdS4VV+qYxxljK/HKpAPQ=",
