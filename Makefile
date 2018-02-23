@@ -26,7 +26,10 @@ vet:
 
 test:
 	@echo ">> testing code"
-	@$(GO) test $(pkgs)
+	@$(GO) test -v $(pkgs)
+
+bench:
+	@$(GO) test -v -bench=. $(pkgs)
 
 build: promu
 	@echo ">> building binaries"

@@ -5,6 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"strconv"
+	"time"
 
 	"github.com/prometheus/common/log"
 	"github.com/valyala/fasttemplate"
@@ -95,15 +97,17 @@ func (input SyslogInput) StartStream(ch chan<- string) {
 	}
 	log.Infof("Syslog server started listening at %s", input.listenAddr)
 
-	go func(lineIn syslog.LogPartsChannel) {
-		for parts := range lineIn {
-			line := input.template.ExecuteFuncString(func(w io.Writer, tag string) (int, error) { return tmplTagFunc(w, tag, parts) })
-			ch <- line
-		}
-	}(syslogChannel)
+	go messageHandler(input.template, ch, syslogChannel)
 
 	server.Wait()
 	log.Info("Syslog server shutting down")
+}
+
+func messageHandler(template *fasttemplate.Template, ch chan<- string, lineIn syslog.LogPartsChannel) {
+	for parts := range lineIn {
+		line := template.ExecuteFuncString(func(w io.Writer, tag string) (int, error) { return tmplTagFunc(w, tag, parts) })
+		ch <- line
+	}
 }
 
 func tmplTagFunc(w io.Writer, tag string, m map[string]interface{}) (int, error) {
@@ -116,8 +120,13 @@ func tmplTagFunc(w io.Writer, tag string, m map[string]interface{}) (int, error)
 		return w.Write(value)
 	case string:
 		return w.Write([]byte(value))
+	case int:
+		return w.Write([]byte(strconv.FormatInt(int64(value), 10)))
+	case time.Time:
+		return w.Write([]byte(value.String()))
+	case fmt.Stringer:
+		return w.Write([]byte(value.String()))
 	default:
-		// TODO: Performance test
 		return w.Write([]byte(fmt.Sprintf("%v", v)))
 	}
 }
