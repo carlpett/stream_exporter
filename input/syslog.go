@@ -4,8 +4,10 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 
 	"github.com/prometheus/common/log"
+	"github.com/valyala/fasttemplate"
 	"gopkg.in/mcuadros/go-syslog.v2"
 	"gopkg.in/mcuadros/go-syslog.v2/format"
 )
@@ -14,12 +16,14 @@ type SyslogInput struct {
 	listenAddr   string
 	listenFamily string
 	format       format.Format
+	template     *fasttemplate.Template
 }
 
 var (
 	syslogListenFamily = flag.String("input.syslog.listenfamily", "", "Listening protocol family (tcp/udp/unix)")
 	syslogListenAddr   = flag.String("input.syslog.listenaddr", "", "Listening address of syslog server")
 	syslogFormatFlag   = flag.String("input.syslog.format", "autodetect", "Format of incoming syslog data (rfc3164/rfc5424/rfc6587/autodetect)")
+	syslogLineTemplate = flag.String("input.syslog.linetemplate", "[message][content]", "Template for data to pass to pattern matcher")
 )
 
 func init() {
@@ -57,6 +61,7 @@ func newSyslogInput() (StreamInput, error) {
 		listenAddr:   *syslogListenAddr,
 		listenFamily: *syslogListenFamily,
 		format:       syslogFormat,
+		template:     fasttemplate.New(*syslogLineTemplate, "[", "]"),
 	}, nil
 }
 
@@ -92,23 +97,27 @@ func (input SyslogInput) StartStream(ch chan<- string) {
 
 	go func(lineIn syslog.LogPartsChannel) {
 		for parts := range lineIn {
-			ch <- fmt.Sprintf("%v", parts["content"])
-			/* parts is a map with the following keys:
-			-hostname
-			-tag
-			-content (Message part)
-			-facility
-			-tls_peer
-			-timestamp
-			-severity
-			-client
-			-priority
-			Should these be joined up? Should it be possible to ask for a particular field? User-specified Sprintf-format?
-			For now, just send the message itself.
-			*/
+			line := input.template.ExecuteFuncString(func(w io.Writer, tag string) (int, error) { return tmplTagFunc(w, tag, parts) })
+			ch <- line
 		}
 	}(syslogChannel)
 
 	server.Wait()
 	log.Info("Syslog server shutting down")
+}
+
+func tmplTagFunc(w io.Writer, tag string, m map[string]interface{}) (int, error) {
+	v := m[tag]
+	if v == nil {
+		return 0, nil
+	}
+	switch value := v.(type) {
+	case []byte:
+		return w.Write(value)
+	case string:
+		return w.Write([]byte(value))
+	default:
+		// TODO: Performance test
+		return w.Write([]byte(fmt.Sprintf("%v", v)))
+	}
 }

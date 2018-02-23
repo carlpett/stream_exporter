@@ -131,6 +131,29 @@ The `syslog` input has three parameters:
 - `input.syslog.listenfamily` (Required): The address family of the server. Valid values depend on platform, but include `tcp` and `udp`. On Linux and certain other systems, `unix` is also available.
 - `input.syslog.listenaddr` (Required): The listen specification, for example `:1514` to listen on all interfaces on port 1514.
 - `input.syslog.format` (Optional, default `autodetect`): The format of the syslog messages. Defaults to automatic detection, can also be set to `rfc3164`, `rfc5424` or `rfc6587`.
+- `input.syslog.linetemplate` (Optional, default `[message][content]`): The template to use to for lines passed to the pattern matcher. `[]`-delimited words are substituted with the corresponding fields from the syslog message. Non-existing fields will be ignored. The following fields are available:
+
+   All formats:
+   - `client`
+   - `facility`
+   - `hostname`
+   - `priority`
+   - `severity`
+   - `timestamp`
+   - `tls_peer`
+
+   RFC3164 only:
+   - `content`
+   - `tag`
+
+   RFC5424 only:
+   - `app_name`
+   - `message`
+   - `msg_id`
+   - `proc_id`
+   - `version`
+
+   Since non-existing fields are ignored, the pattern `[message][content]` will contain the main part of the line regardless of which format is used.
 
 ## Named pipe
 Creates a named pipe to which lines can be written. Only available on Linux.
