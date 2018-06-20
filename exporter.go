@@ -124,6 +124,7 @@ func main() {
 				done = true
 				break
 			}
+			log.Debugf("Got line %q", line)
 			for _, m := range metrics {
 				t := time.Now()
 				m.MatchLine(line)
