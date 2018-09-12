@@ -4,8 +4,10 @@ import (
 	"errors"
 	"io/ioutil"
 	"regexp"
+	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/common/log"
 	"gopkg.in/yaml.v2"
 )
 
@@ -83,4 +85,16 @@ func getValueCaptureIndex(labels []string) (int, error) {
 	}
 
 	return valueIdx, nil
+}
+
+func getLabelsAndValue(matches []string, valueIdx int) ([]string, float64, error) {
+	captures := matches[1:]
+	valueStr := captures[valueIdx]
+	value, err := strconv.ParseFloat(valueStr, 64)
+	if err != nil {
+		log.Warnf("Unable to convert %s to float\n", valueStr)
+		return nil, 0, err
+	}
+	labels := append(captures[0:valueIdx], captures[valueIdx+1:]...)
+	return labels, value, nil
 }
