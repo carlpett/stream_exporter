@@ -36,15 +36,11 @@ type HistogramVecLineMetric struct {
 func (histogram HistogramVecLineMetric) MatchLine(s string) {
 	matches := histogram.pattern.FindStringSubmatch(s)
 	if len(matches) > 0 {
-		captures := matches[1:]
-		valueStr := captures[histogram.valueIdx]
-		value, err := strconv.ParseFloat(valueStr, 64)
+		labels, value, err := getLabelsAndValue(matches, histogram.valueIdx)
 		if err != nil {
-			log.Warnf("Unable to convert %s to float\n", valueStr)
 			return
 		}
-		capturedLabels := append(captures[0:histogram.valueIdx], captures[histogram.valueIdx+1:]...)
-		histogram.metric.WithLabelValues(capturedLabels...).Observe(value)
+		histogram.metric.WithLabelValues(labels...).Observe(value)
 	}
 }
 

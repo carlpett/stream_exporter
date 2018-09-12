@@ -16,14 +16,11 @@ type GaugeVecLineMetric struct {
 func (gauge GaugeVecLineMetric) MatchLine(s string) {
 	matches := gauge.pattern.FindStringSubmatch(s)
 	if len(matches) > 0 {
-		captures := matches[1:]
-		valueStr := captures[gauge.valueIdx]
-		value, err := strconv.ParseFloat(valueStr, 64)
+		labels, value, err := getLabelsAndValue(matches, gauge.valueIdx)
 		if err != nil {
-			log.Warnf("Unable to convert %s to float\n", valueStr)
 			return
 		}
-		gauge.metric.WithLabelValues(captures...).Set(value)
+		gauge.metric.WithLabelValues(labels...).Set(value)
 	}
 }
 
