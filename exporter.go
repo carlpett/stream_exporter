@@ -45,6 +45,7 @@ var (
 
 	inputType      = flag.String("input.type", "", "What input module to use")
 	listInputTypes = flag.Bool("input.print", false, "Print available input modules and exit")
+	redirectStdout = flag.Bool("input.redirectstdout", false, "Redirects to stdout")
 
 	metricsListenAddr = flag.String("web.listen-address", ":9178", "Address on which to expose metrics")
 	metricsPath       = flag.String("web.metrics-path", "/metrics", "Path under which the metrics are available")
@@ -124,7 +125,7 @@ func main() {
 				done = true
 				break
 			}
-			log.Debugf("Got line %q", line)
+			logLine(line)
 			for _, m := range metrics {
 				t := time.Now()
 				m.MatchLine(line)
@@ -136,5 +137,13 @@ func main() {
 			done = true
 			break
 		}
+	}
+}
+
+func logLine(line string) {
+	if *redirectStdout == true {
+		fmt.Println(line)
+	} else {
+		log.Debugf(line)
 	}
 }
