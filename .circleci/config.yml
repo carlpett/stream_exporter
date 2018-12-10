@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.11
     working_directory: /go/src/github.com/carlpett/stream_exporter
     steps:
       - checkout
@@ -10,12 +10,13 @@ jobs:
           name: Build
           command: |
             make promu
+            git describe --always --tags | sed -r 's/^v//' | tee VERSION
             promu crossbuild
       - store_artifacts:
           path: .build
   docker-latest:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.11
     steps:
       - run:
           name: Trigger Docker Hub automated build
@@ -25,10 +26,12 @@ jobs:
               https://registry.hub.docker.com/u/carlpett/stream_exporter/trigger/$DOCKER_HUB_TRIGGER_TOKEN/
   release:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.11
     working_directory: /go/src/github.com/carlpett/stream_exporter
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Download github-release tool
           command: |
@@ -38,6 +41,7 @@ jobs:
           name: Create release
           commands: |
             make promu
+            git describe --always --tags | sed -r 's/^v//' | tee VERSION
             promu crossbuild tarballs
             promu checksum .tarballs
             promu release .tarballs
