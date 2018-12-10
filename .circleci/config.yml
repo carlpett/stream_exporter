@@ -6,7 +6,11 @@ jobs:
     working_directory: /go/src/github.com/carlpett/stream_exporter
     steps:
       - checkout
-      - run: promu crossbuild
+      - run:
+          name: Build
+          command: |
+            make promu
+            promu crossbuild
       - store_artifacts:
           path: .build
   docker-latest:
@@ -33,6 +37,7 @@ jobs:
       - run:
           name: Create release
           commands: |
+            make promu
             promu crossbuild tarballs
             promu checksum .tarballs
             promu release .tarballs
