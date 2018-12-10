@@ -9,9 +9,8 @@ jobs:
       - run:
           name: Build
           command: |
-            make promu
             git describe --always --tags | sed -r 's/^v//' | tee VERSION
-            promu crossbuild
+            make build
       - store_artifacts:
           path: .build
   docker-latest:
