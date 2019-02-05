@@ -2,15 +2,12 @@ package input
 
 import (
 	"bufio"
-	"bytes"
 	"errors"
 	"flag"
 	"fmt"
 	"os"
 
 	"github.com/hpcloud/tail"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/common/expfmt"
 	"github.com/prometheus/common/log"
 )
 
@@ -66,17 +63,7 @@ func (input DryrunFileInput) StartStream(ch chan<- string) {
 	}
 
 	fmt.Println("Finished reading file, dumping final metrics endpoint output:")
-	metfam, err := prometheus.DefaultGatherer.Gather()
-	if err != nil {
-		log.Fatal(err)
-	}
-	out := &bytes.Buffer{}
-	for _, met := range metfam {
-		if _, err := expfmt.MetricFamilyToText(out, met); err != nil {
-			log.Fatal(err)
-		}
-	}
-	fmt.Println(out)
+	writeMetrics(os.Stdout)
 }
 
 func (input TailingFileInput) StartStream(ch chan<- string) {

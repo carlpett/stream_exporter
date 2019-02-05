@@ -107,13 +107,21 @@ Example:
 # Input modules
 A number of input modules are available, described here with their parameters.
 
+## Standard input
+Reads from standard input.
+
+The `stdin` input has two commandline flags:
+
+- `input.stdin.quit-on-eof` (Optional, default `false`): If `true`, the exporter will quit after getting to end of file. By default, it will keep running, and the metrics endpoint will still be available.
+- `input.stdin.write-on-eof` (Optional, default `false`): If `true`, all the collected metrics will be writted to stdout after getting to end of file. Useful in combination with `quit-on-eof` for configuration testing.
+
 ## File
 Reads lines from a file.
 
 The `file` input has two parameters:
 
 - `-input.file.path` (Required) : The path to the file to read from.
-- `-input.file.mode` (Optional, default `tail`): `tail` or `dryrun`. In `tail` mode, the file is opened and any new lines written to the file is processed. In `dryrun` mode, the entire file is read and processed. When the end of the file is encountered, the current metrics state is written to standard out, and the exporter exits. Useful for debugging and configuration testing.
+- `-input.file.mode` (_Deprecated_, Optional, default `tail`): `tail` or `dryrun`. In `tail` mode, the file is opened and any new lines written to the file is processed. In `dryrun` mode, the entire file is read and processed. When the end of the file is encountered, the current metrics state is written to standard out, and the exporter exits. Useful for debugging and configuration testing. *NOTE:* The `dryrun` mode is deprecated, and using the `stdin` input along with `input.stdin.write-on-eof` is recommended as a replacement.
 
 ## Socket
 Opens a socket for reading lines. 
@@ -161,11 +169,6 @@ Creates a named pipe to which lines can be written. Only available on Linux.
 The `namedpipe` input has one parameter:
 
 - `input.namedpipe.path` (Required): The path where the pipe should be created. This may require elevated privileges to execute a `mkfifo` syscall.
-
-## Standard input
-Reads from standard input.
-
-The `stdin` input does not take any parameters.
 
 # Building
 The project uses [govendor](https://github.com/kardianos/govendor) for dependency management. To build the exporter, call `govendor build +p`.
