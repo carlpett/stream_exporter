@@ -162,6 +162,10 @@ The `namedpipe` input has one parameter:
 
 - `input.namedpipe.path` (Required): The path where the pipe should be created. This may require elevated privileges to execute a `mkfifo` syscall.
 
+## Standard input
+Reads from standard input.
+
+The `stdin` input does not take any parameters.
 
 # Building
 The project uses [govendor](https://github.com/kardianos/govendor) for dependency management. To build the exporter, call `govendor build +p`.
