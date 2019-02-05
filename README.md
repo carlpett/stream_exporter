@@ -1,6 +1,6 @@
 # Stream Exporter
 
-[![CircleCI](https://circleci.com/gh/carlpett/stream_exporter.svg?style=shield)](https://circleci.com/gh/carlpett/stream_exporter)
+[![CircleCI](https://circleci.com/gh/carlpett/stream_exporter.svg?style=shield)](https://circleci.com/gh/carlpett/stream_exporter) [![DockerHub](https://img.shields.io/docker/build/carlpett/stream_exporter.svg?style=shield)](https://hub.docker.com/r/carlpett/stream_exporter/)
 
 A [Prometheus](https://prometheus.io) exporter for extracting metrics from streaming sources of text, such as logs written to a socket, or tailing a file.
 Extraction into metrics is done using regular expressions, on a per-line basis. Capture groups in the regular expression are used as labels in the metrics. All Prometheus metric types are supported, and fully configurable.
