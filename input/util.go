@@ -10,8 +10,14 @@ import (
 	"github.com/prometheus/common/log"
 )
 
+func SetOutputMetrics(g prometheus.Gatherer) {
+	gatherer = g
+}
+
+var gatherer = prometheus.DefaultGatherer
+
 func writeMetrics(w io.Writer) {
-	metfam, err := prometheus.DefaultGatherer.Gather()
+	metfam, err := gatherer.Gather()
 	if err != nil {
 		log.Fatal(err)
 	}

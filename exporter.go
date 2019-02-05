@@ -57,12 +57,18 @@ var startupTasks = make(map[string]startupTask, 0)
 
 func main() {
 	flag.Parse()
-
 	if *showVersion {
 		fmt.Printf(version.Print("stream_exporter"))
 		os.Exit(0)
 	}
-	prometheus.MustRegister(version.NewCollector("stream_exporter"))
+	if *listInputTypes {
+		fmt.Println(input.GetAvailableInputs())
+		os.Exit(0)
+	}
+	if *inputType == "" {
+		log.Errorf("-input.type is required. The following input types are available:\n%v", input.GetAvailableInputs())
+		os.Exit(1)
+	}
 
 	// Startup tasks can be registered to perform (typically os-specific) initialization
 	for taskName, task := range startupTasks {
@@ -73,14 +79,13 @@ func main() {
 		}
 	}
 
-	if *listInputTypes {
-		fmt.Println(input.GetAvailableInputs())
-		os.Exit(0)
-	}
-	if *inputType == "" {
-		log.Errorf("-input.type is required. The following input types are available:\n%v", input.GetAvailableInputs())
-		os.Exit(1)
-	}
+	// Build separate metrics registries for process metadata and the user-input stream metrics
+	metaRegistry := prometheus.NewRegistry()
+	metaRegistry.MustRegister(version.NewCollector("stream_exporter"))
+	metaRegistry.MustRegister(prometheus.NewGoCollector(), prometheus.NewProcessCollector(os.Getpid(), ""))
+
+	streamRegistry := prometheus.NewRegistry()
+	input.SetOutputMetrics(streamRegistry) // TODO: The naming here isn't great...
 
 	metricsConfig, err := linemetrics.ReadPatternConfig(*configFilePath)
 	if err != nil {
@@ -92,11 +97,10 @@ func main() {
 	for _, definition := range metricsConfig {
 		lineMetric, collector := linemetrics.NewLineMetric(definition)
 		metrics = append(metrics, lineMetric)
-		prometheus.MustRegister(collector)
+		streamRegistry.MustRegister(collector)
 	}
-
-	prometheus.MustRegister(lineProcessingTime)
-	prometheus.MustRegister(totalLines)
+	streamRegistry.MustRegister(lineProcessingTime)
+	streamRegistry.MustRegister(totalLines)
 
 	// Setup signal handling
 	signal.Notify(quitSig, os.Interrupt)
@@ -111,8 +115,13 @@ func main() {
 	go inputReader.StartStream(inputChannel)
 
 	// Setup http server
-	http.Handle(*metricsPath, promhttp.Handler())
-	go http.ListenAndServe(*metricsListenAddr, nil)
+	http.Handle(*metricsPath, promhttp.HandlerFor(prometheus.Gatherers{metaRegistry, streamRegistry}, promhttp.HandlerOpts{}))
+	go func() {
+		err := http.ListenAndServe(*metricsListenAddr, nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 	log.Infof("Serving metrics on %s%s", *metricsListenAddr, *metricsPath)
 
 	// Main loop
