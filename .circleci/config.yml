@@ -2,20 +2,23 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.12
     working_directory: /go/src/github.com/carlpett/stream_exporter
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Build
           command: |
-            git describe --always --tags | sed -r 's/^v//' | tee VERSION
-            make build
+            make crossbuild
+            make test
+            make docker
       - store_artifacts:
-          path: .build
+          path: binaries
   docker-latest:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.12
     steps:
       - run:
           name: Trigger Docker Hub automated build
@@ -25,25 +28,15 @@ jobs:
               https://registry.hub.docker.com/u/carlpett/stream_exporter/trigger/$DOCKER_HUB_TRIGGER_TOKEN/
   release:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.12
     working_directory: /go/src/github.com/carlpett/stream_exporter
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run:
-          name: Download github-release tool
-          command: |
-            curl -sL 'https://github.com/aktau/github-release/releases/download/v0.6.2/linux-amd64-github-release.tar.bz2' | \
-              tar xjf - --strip-components 3 -C /go/bin
       - run:
           name: Create release
           command: |
-            make promu
-            git describe --always --tags | sed -r 's/^v//' | tee VERSION
-            promu crossbuild tarballs
-            promu checksum .tarballs
-            promu release .tarballs
+            make crossbuild
+            make release
       - run:
           name: Trigger Docker Hub automated build
           command: |
@@ -51,7 +44,7 @@ jobs:
               --data "{\"source_type\": \"Tag\", \"source_name\": \"$CIRCLE_TAG\"}" \
               https://registry.hub.docker.com/u/carlpett/stream_exporter/trigger/$DOCKER_HUB_TRIGGER_TOKEN/
       - store_artifacts:
-          path: .build
+          path: binaries
 
 workflows:
   version: 2
