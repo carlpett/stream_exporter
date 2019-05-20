@@ -1,13 +1,11 @@
-FROM golang:1.8
+FROM golang:1.12
 WORKDIR /go/src/github.com/carlpett/stream_exporter/
-RUN go get -u github.com/kardianos/govendor
 COPY . .
-RUN govendor build +p
+RUN make build
 
-FROM centos:centos7
+FROM busybox:glibc
 WORKDIR /usr/bin/
 COPY --from=0 /go/src/github.com/carlpett/stream_exporter/stream_exporter /usr/bin/stream_exporter
-RUN adduser -u 1000 stream_exporter
-USER stream_exporter
+USER 1000
 ENTRYPOINT ["/usr/bin/stream_exporter"]
 EXPOSE 9178
