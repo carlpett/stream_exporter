@@ -5,7 +5,7 @@ CROSSBUILD_ARCH = 386 amd64
 
 VERSION   := $(shell git describe --tags --dirty=-dirty)
 REVISION  := $(shell git describe --abbrev=0 --always --match=always-commit-hash --dirty=-dirty)
-BRANCH    := $(shell git rev-parse --abbrev-ref HEAD)
+BRANCH    := $(or $(shell git symbolic-ref --short HEAD), release-tag)
 BUILDDATE := $(shell date --iso-8601=seconds)
 BUILDUSER ?= $(USER)
 BUILDHOST ?= $(HOSTNAME)
