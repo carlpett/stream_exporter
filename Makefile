@@ -5,15 +5,15 @@ CROSSBUILD_ARCH = 386 amd64
 
 VERSION   := $(shell git describe --tags --dirty=-dirty)
 REVISION  := $(shell git describe --abbrev=0 --always --match=always-commit-hash --dirty=-dirty)
-BRANCH    := $(or $(shell git symbolic-ref --short HEAD), release-tag)
+BRANCH    := $(or $(shell git symbolic-ref --short HEAD 2>/dev/null), "from-release-tag")
 BUILDDATE := $(shell date --iso-8601=seconds)
 BUILDUSER ?= $(USER)
 BUILDHOST ?= $(HOSTNAME)
-LDFLAGS    = -X github.com/prometheus/common/version.Version=$(VERSION) \
-             -X github.com/prometheus/common/version.Revision=$(REVISION) \
-             -X github.com/prometheus/common/version.Branch=$(BRANCH) \
-             -X github.com/prometheus/common/version.BuildUser=$(BUILDUSER)@$(BUILDHOST) \
-             -X github.com/prometheus/common/version.BuildDate=$(BUILDDATE)
+LDFLAGS    = -X github.com/carlpett/stream_exporter/vendor/github.com/prometheus/common/version.Version=$(VERSION) \
+             -X github.com/carlpett/stream_exporter/vendor/github.com/prometheus/common/version.Revision=$(REVISION) \
+             -X github.com/carlpett/stream_exporter/vendor/github.com/prometheus/common/version.Branch=$(BRANCH) \
+             -X github.com/carlpett/stream_exporter/vendor/github.com/prometheus/common/version.BuildUser=$(BUILDUSER)@$(BUILDHOST) \
+             -X github.com/carlpett/stream_exporter/vendor/github.com/prometheus/common/version.BuildDate=$(BUILDDATE)
 
 all: build test
 
